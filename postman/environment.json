@@ -1,0 +1,19 @@
+{
+  "id": "e5c70757-0a4a-4467-bc1f-8a0bfb55ff89",
+  "name": "LMS Dev Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081/api/v1",
+      "type": "text",
+      "enabled": true
+    },
+    {
+      "key": "accessToken",
+      "value": "your-jwt-access-token-placeholder",
+      "type": "text",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

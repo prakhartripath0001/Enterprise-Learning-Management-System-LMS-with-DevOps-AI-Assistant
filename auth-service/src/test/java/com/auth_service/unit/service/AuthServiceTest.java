@@ -242,7 +242,7 @@ class AuthServiceTest {
             when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(i -> i.getArgument(0));
 
             // Act
-            AuthResponse response = authService.login(validLoginRequest);
+            AuthResponse response = authService.login(validLoginRequest, "127.0.0.1", "test-agent");
 
             // Assert
             assertThat(response).isNotNull();
@@ -260,7 +260,7 @@ class AuthServiceTest {
             when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
             // Act & Assert
-            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest));
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
         }
 
         @Test
@@ -270,7 +270,7 @@ class AuthServiceTest {
             when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest));
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
         }
 
         @Test
@@ -282,7 +282,7 @@ class AuthServiceTest {
             when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(activeUser));
 
             // Act & Assert
-            assertThrows(AccountLockedException.class, () -> authService.login(validLoginRequest));
+            assertThrows(AccountLockedException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
         }
 
         @Test
@@ -293,7 +293,7 @@ class AuthServiceTest {
             when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(activeUser));
 
             // Act & Assert
-            assertThrows(EmailNotVerifiedException.class, () -> authService.login(validLoginRequest));
+            assertThrows(EmailNotVerifiedException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
         }
 
         @Test
@@ -307,7 +307,7 @@ class AuthServiceTest {
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
             // Act
-            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest));
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
 
             // Assert
             verify(userRepository).save(userCaptor.capture());
@@ -325,7 +325,7 @@ class AuthServiceTest {
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
             // Act
-            assertThrows(AccountLockedException.class, () -> authService.login(validLoginRequest));
+            assertThrows(AccountLockedException.class, () -> authService.login(validLoginRequest, "127.0.0.1", "test-agent"));
 
             // Assert: account must now be locked
             verify(userRepository).save(userCaptor.capture());
@@ -347,7 +347,7 @@ class AuthServiceTest {
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
             // Act
-            authService.login(validLoginRequest);
+            authService.login(validLoginRequest, "127.0.0.1", "test-agent");
 
             // Assert
             verify(userRepository).save(userCaptor.capture());
@@ -421,7 +421,7 @@ class AuthServiceTest {
             when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
             // Act
-            authService.verifyEmail("rawVerificationToken");
+            authService.verifyEmail(new com.auth_service.dto.request.VerifyEmailRequest("rawVerificationToken"));
 
             // Assert
             ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -436,7 +436,7 @@ class AuthServiceTest {
             when(emailVerificationTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThrows(InvalidTokenException.class, () -> authService.verifyEmail("invalidToken"));
+            assertThrows(InvalidTokenException.class, () -> authService.verifyEmail(new com.auth_service.dto.request.VerifyEmailRequest("invalidToken")));
         }
 
         @Test
@@ -450,7 +450,7 @@ class AuthServiceTest {
             when(emailVerificationTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(token));
 
             // Act & Assert
-            assertThrows(TokenAlreadyUsedException.class, () -> authService.verifyEmail("usedToken"));
+            assertThrows(TokenAlreadyUsedException.class, () -> authService.verifyEmail(new com.auth_service.dto.request.VerifyEmailRequest("usedToken")));
         }
 
         @Test
@@ -464,7 +464,7 @@ class AuthServiceTest {
             when(emailVerificationTokenRepository.findByTokenHash(anyString())).thenReturn(Optional.of(token));
 
             // Act & Assert
-            assertThrows(InvalidTokenException.class, () -> authService.verifyEmail("expiredToken"));
+            assertThrows(InvalidTokenException.class, () -> authService.verifyEmail(new com.auth_service.dto.request.VerifyEmailRequest("expiredToken")));
         }
     }
 

@@ -1,0 +1,39 @@
+{
+  "info": {
+    "name": "Course Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Courses - Mock Success",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/courses",
+          "host": ["{{baseUrl}}"],
+          "path": ["courses"]
+        }
+      }
+    },
+    {
+      "name": "Create Course - Mock Forbidden (Students cannot create courses)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Advanced Docker Deployment\",\n  \"description\": \"Deploy and manage complex stacks\",\n  \"instructorId\": \"instructor-uuid-123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/courses",
+          "host": ["{{baseUrl}}"],
+          "path": ["courses"]
+        }
+      }
+    }
+  ]
+}

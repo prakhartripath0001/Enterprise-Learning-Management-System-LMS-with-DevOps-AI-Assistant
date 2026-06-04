@@ -1,0 +1,36 @@
+name: Docker Compose Validation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docker-compose.yml'
+      - 'auth-service/Dockerfile*'
+      - 'frontend/Dockerfile*'
+      - '.github/workflows/docker-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docker-compose.yml'
+      - 'auth-service/Dockerfile*'
+      - 'frontend/Dockerfile*'
+      - '.github/workflows/docker-build.yml'
+
+jobs:
+  validate-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify Compose Configuration Syntax
+        run: docker compose config
+
+      - name: Pre-build Backend (Needed for standard Dockerfile target JAR copy)
+        run: |
+          cd auth-service
+          ./mvnw clean package -DskipTests -B
+
+      - name: Build Stack Containers
+        run: docker compose build

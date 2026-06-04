@@ -62,7 +62,7 @@ public class AuthController {
                 httpRequest.getRemoteAddr(),
                 httpRequest.getHeader("User-Agent"));
 
-        Cookie cookie = buildRefreshTokenCookie(REFRESH_TOKEN_COOKIE, "");
+        Cookie cookie = buildRefreshTokenCookie(REFRESH_TOKEN_COOKIE, authResponse.refreshToken());
         httpResponse.addCookie(cookie);
 
         return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
@@ -98,7 +98,7 @@ public class AuthController {
                 request.getRemoteAddr(),
                 request.getHeader("User-Agent"));
 
-        Cookie newCookie = buildRefreshTokenCookie(REFRESH_TOKEN_COOKIE, "");
+        Cookie newCookie = buildRefreshTokenCookie(REFRESH_TOKEN_COOKIE, authResponse.refreshToken());
         response.addCookie(newCookie);
 
         return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", authResponse));

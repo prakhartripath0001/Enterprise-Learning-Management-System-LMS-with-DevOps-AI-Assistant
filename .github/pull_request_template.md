@@ -1,24 +1,19 @@
-## Summary
-Brief description of what this PR does.
+## [Issue #] Summary
+Provide a clear and concise description of the changes made and the issue they address.
 
-## Type of Change
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Documentation
-- [ ] Refactoring
-- [ ] CI/CD change
+## Screenshots (if applicable)
+For frontend changes, add screenshots or recording demonstrating the new interfaces.
 
-## Related Issues
-Closes #
+## Test Evidence
+Detail how this PR was tested:
+*   Unit tests passing (include JaCoCo/Vitest summary or terminal snapshot)
+*   Local manual verification steps
 
-## How Has This Been Tested?
-Describe the tests run and the testing approach.
-
-## Checklist
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] No breaking changes (or noted in the description)
-- [ ] Code compiles and all tests pass locally
-- [ ] Swagger/OpenAPI documentation is updated (if API changed)
-- [ ] No sensitive data (keys, passwords) is committed
-- [ ] Branch is up to date with develop
+## PR Checklist
+- [ ] Code compiles locally without errors or warnings.
+- [ ] No field injection `@Autowired` introduced (constructor injection only).
+- [ ] Lint checks pass and formatting matches guidelines.
+- [ ] All unit and integration tests pass successfully.
+- [ ] Test coverage meets the minimum 80% threshold.
+- [ ] Custom database migrations (Flyway) are placed under resources.
+- [ ] OpenAPI contracts / documentation updated.

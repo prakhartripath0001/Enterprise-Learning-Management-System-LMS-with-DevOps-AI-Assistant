@@ -1,0 +1,41 @@
+{
+  "info": {
+    "name": "Enrollment Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Enroll in Course - Mock Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"courseId\": \"course-uuid-456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enrollments",
+          "host": ["{{baseUrl}}"],
+          "path": ["enrollments"]
+        }
+      }
+    },
+    {
+      "name": "Get Enrollments - Mock Success",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enrollments/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["enrollments", "me"]
+        }
+      }
+    }
+  ]
+}

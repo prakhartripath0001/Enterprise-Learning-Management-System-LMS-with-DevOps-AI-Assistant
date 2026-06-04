@@ -172,6 +172,7 @@ public class AuthServiceImpl implements AuthService {
 
         return new AuthResponse(
                 accessToken,
+                rawRefreshToken,
                 "Bearer",
                 900L,
                 new AuthResponse.UserSummary(
@@ -219,7 +220,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateAccessToken(user);
         Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
-        return new AuthResponse(accessToken, "Bearer", 900L,
+        return new AuthResponse(accessToken, newRawToken, "Bearer", 900L,
                 new AuthResponse.UserSummary(
                         user.getId(), user.getEmail(), user.getUsername(),
                         user.getFirstName(), user.getLastName(), roles,

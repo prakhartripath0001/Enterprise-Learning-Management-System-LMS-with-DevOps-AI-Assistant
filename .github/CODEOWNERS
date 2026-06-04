@@ -1,0 +1,14 @@
+# CODEOWNERS for AetherLMS project
+
+# Global owners for overall repository governance
+*                      @governance-lead
+
+# Backend engineering reviews
+/auth-service/         @backend-architects
+
+# Frontend engineering reviews
+/frontend/             @frontend-leads
+
+# DevOps and pipeline configurations
+/.github/workflows/   @devops-engineers
+/docker-compose.yml   @devops-engineers
