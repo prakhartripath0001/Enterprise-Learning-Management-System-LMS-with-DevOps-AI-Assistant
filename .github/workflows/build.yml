@@ -43,7 +43,7 @@ jobs:
         run: ./mvnw test
 
       - name: Upload Surefire Test Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: surefire-reports-${{ matrix.service }}
@@ -55,7 +55,7 @@ jobs:
         run: ./mvnw verify
 
       - name: Upload JaCoCo Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-report-${{ matrix.service }}
           path: ${{ matrix.service }}/target/site/jacoco/
@@ -66,7 +66,7 @@ jobs:
         run: ./mvnw package -DskipTests -q
 
       - name: Upload Production JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jar-${{ matrix.service }}
           path: ${{ matrix.service }}/target/*.jar
