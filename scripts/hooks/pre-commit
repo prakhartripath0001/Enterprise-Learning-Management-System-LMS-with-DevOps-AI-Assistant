@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# ==============================================================================
+# Git Pre-Commit Hook
+# Runs: Security scan, Compilation check
+# ==============================================================================
+
+set -eo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
+
+echo -e "${YELLOW}▶ Running pre-commit checks...${NC}"
+
+# ── Security Scan ─────────────────────────────────────────────────────────────
+"$ROOT_DIR/scripts/security-scan.sh" || {
+  echo -e "${RED}✘ Pre-commit FAILED: Security scan violations found.${NC}"
+  exit 1
+}
+
+# ── Compilation Check ─────────────────────────────────────────────────────────
+SERVICES=("auth-service")
+for service in "${SERVICES[@]}"; do
+  echo -e "${YELLOW}▶ Compiling $service...${NC}"
+  if ! (cd "$ROOT_DIR/$service" && ./mvnw compile -q); then
+    echo -e "${RED}✘ Pre-commit FAILED: $service does not compile.${NC}"
+    exit 1
+  fi
+done
+
+echo -e "${GREEN}✔ Pre-commit checks passed. Proceeding with commit.${NC}"
+exit 0
