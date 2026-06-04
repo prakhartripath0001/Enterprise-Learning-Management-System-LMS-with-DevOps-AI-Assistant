@@ -1,0 +1,125 @@
+# Enterprise LMS AI Coding Instructions (.cursorrules)
+
+You are an expert AI software engineer specialized in building enterprise-grade, highly scalable microservice architectures using Java 21 and Spring Boot 3. When writing code in this repository, you must strictly adhere to the following rules, standards, and patterns.
+
+---
+
+## 1. Core Technology Stack
+
+- **Backend**: Java 21 (LTS), Spring Boot 3.x (Spring Web, Spring Security, Spring Data JPA)
+- **Database**: MySQL 8.0, Flyway for schema migrations
+- **Containerization**: Docker, Docker Compose
+- **Authentication**: JWT (JSON Web Tokens) stateless authentication, BCrypt for password hashing
+- **Testing**: JUnit 5, Mockito, AssertJ
+
+---
+
+## 2. Architecture & Design Rules
+
+### Rule 1: Follow SOLID Principles
+- **Single Responsibility (SRP)**: Keep classes small and focused. Controllers only map HTTP requests. Services execute business logic. Repositories handle database I/O.
+- **Open-Closed (OCP)**: Design components that can be extended (via polymorphism or interfaces) without modifying their original source.
+- **Liskov Substitution (LSP)**: Derived classes/implementations must be fully substitutable for their interfaces/parent classes.
+- **Interface Segregation (ISP)**: Create narrow, highly cohesive interfaces instead of monolithic ones.
+- **Dependency Inversion (DIP)**: Always depend on abstractions (interfaces) rather than concrete implementations.
+
+### Rule 2: Constructor Injection Only
+- **NEVER** use `@Autowired` on fields.
+- Always use constructor injection. Mark dependencies as `final`.
+- Utilize Lombok's `@RequiredArgsConstructor` to generate the constructor.
+```java
+// Correct
+@Service
+@RequiredArgsConstructor
+public class CourseServiceImpl implements CourseService {
+    private final CourseRepository courseRepository;
+    private final EnrollmentClient enrollmentClient;
+}
+```
+
+### Rule 3: Layered Architecture
+Strictly enforce the standard three-tier layered architecture:
+`Controller (Web/API)` ➔ `Service (Business Logic)` ➔ `Repository (Data Access)`
+- Controllers must never call Repositories directly.
+- Cross-microservice communication must go through HTTP/gRPC clients in the service layer.
+
+### Rule 4: DTOs for Request and Response (Never Expose Entities)
+- **DO NOT** return JPA `@Entity` objects from Controller endpoints.
+- Map entities to DTOs in the Service layer before returning them.
+- Map incoming DTO payloads to domain entities or service-layer parameters.
+- Use Java 21 `record` types for immutable DTOs.
+```java
+public record CourseResponseDto(
+    Long id,
+    String title,
+    String description,
+    LocalDateTime createdAt
+) {}
+```
+
+### Rule 5: Jakarta Bean Validation
+Annotate incoming DTO request payloads with validation annotations (`jakarta.validation.constraints`) in the Controller parameters.
+- Use `@Valid` on request bodies.
+- Common annotations: `@NotNull`, `@NotBlank`, `@Size`, `@Email`, `@Min`, `@Max`.
+```java
+public record CreateCourseDto(
+    @NotBlank(message = "Title cannot be blank")
+    @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
+    String title,
+
+    @NotBlank(message = "Description cannot be blank")
+    String description
+) {}
+```
+
+### Rule 6: Global Exception Handling
+All errors must return a unified, secure JSON error envelope.
+- Catch all exceptions using a `@RestControllerAdvice` class.
+- Structure error responses with HTTP status, custom error code, human-readable message, validation details, and timestamp.
+- **NEVER** expose database exception messages or raw stack traces.
+
+### Rule 7: REST API Conventions
+- Use plural nouns for resource paths (e.g., `/api/v1/courses`, `/api/v1/users`).
+- Use kebab-case for multi-word paths (e.g., `/api/v1/enrollment-records`).
+- Correctly map HTTP verbs: `GET` (retrieve), `POST` (create), `PUT` (full update), `PATCH` (partial update), `DELETE` (remove).
+- Return standard HTTP status codes:
+  - `200 OK` (successful retrieval/update)
+  - `201 Created` (successful resource creation)
+  - `400 Bad Request` (payload/validation error)
+  - `401 Unauthorized` (missing/invalid JWT)
+  - `403 Forbidden` (lack of role/permissions)
+  - `404 Not Found` (resource doesn't exist)
+
+### Rule 8: Secure Password Hashing
+- Always hash passwords with **BCrypt** (minimum strength/work factor: 12) before persisting them.
+- **NEVER** write your own custom hashing algorithms.
+
+---
+
+## 3. Coding Style & Quality
+
+- **Virtual Threads**: Enable virtual threads for non-blocking I/O throughput: `spring.threads.virtual.enabled=true`.
+- **Composition over Inheritance**: Prefer combining objects using references over building deep class inheritance hierarchies.
+- **Clean Code**:
+  - Keep methods small (under 20-30 lines).
+  - Use highly descriptive variable and method names.
+  - Guard clauses: Exit methods early when invalid parameters are supplied.
+- **No Hardcoded Secrets**: Load all API keys, database credentials, and JWT secret keys from the environment or Spring Boot configuration properties (`@ConfigurationProperties`).
+
+---
+
+## 4. Testing Guidelines
+
+- **Unit Testing**: Write unit tests for all service implementations. Use JUnit 5 and Mockito.
+- **Mocking**: Mock all database repositories and external API clients.
+- **Test Isolation**: Assert outcomes cleanly using AssertJ (`assertThat(...)`). Ensure tests are completely stateless and run independently.
+
+---
+
+## 5. Git Workflow & Conventions
+
+Ensure branch names match their scope:
+- `feature_fe/*` for Frontend-only developments
+- `feature_be/*` for Backend-only developments
+- `feature_db/*` for Database migrations/schemas
+Use `git rebase` locally to keep your branches clean and up-to-date with `main`. All merges to `main` must use squash-merging.

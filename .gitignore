@@ -1,0 +1,117 @@
+# ==============================================================================
+# Enterprise Learning Management System (LMS) - Project-wide Git Ignore Rules
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Java Build Artifacts
+# ------------------------------------------------------------------------------
+**/target/
+**/out/
+*.class
+*.jar
+*.war
+*.ear
+
+# ------------------------------------------------------------------------------
+# 2. Maven Configuration
+# ------------------------------------------------------------------------------
+.mvn/wrapper/maven-wrapper.jar
+
+# ------------------------------------------------------------------------------
+# 3. IntelliJ IDEA Configuration (Preserving Team-Shared Configs)
+# ------------------------------------------------------------------------------
+.idea/**
+!.idea/codeStyles/
+!.idea/codeStyles/Project.xml
+!.idea/codeStyles/codeStyleConfig.xml
+!.idea/inspectionProfiles/
+!.idea/inspectionProfiles/Project_Default.xml
+!.idea/inspectionProfiles/profiles_settings.xml
+!.idea/vcs.xml
+!.idea/misc.xml
+
+# Exclude user-specific IntelliJ files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+.idea/dictionaries/
+*.iws
+
+# ------------------------------------------------------------------------------
+# 4. VS Code Configuration (Preserving Team-Shared Configs)
+# ------------------------------------------------------------------------------
+.vscode/**
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Exclude local workspace configurations
+*.code-workspace
+.vscode/ipch/
+
+# ------------------------------------------------------------------------------
+# 5. Operating System Junk
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ------------------------------------------------------------------------------
+# 6. Logging Directories & Output
+# ------------------------------------------------------------------------------
+*.log
+**/logs/
+**/log/
+
+# ------------------------------------------------------------------------------
+# 7. Environment Variables, Profiles, and Secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.jks
+
+# Ignore local spring profiles containing credentials
+**/src/main/resources/application-local.properties
+**/src/main/resources/application-local.yml
+**/src/main/resources/application-dev.properties
+**/src/main/resources/application-dev.yml
+
+# ------------------------------------------------------------------------------
+# 8. Docker Runtime Data & Volumes
+# ------------------------------------------------------------------------------
+**/mysql_data/
+**/postgres_data/
+**/.docker_temp/
+
+# ------------------------------------------------------------------------------
+# 9. Test Reports & Coverage
+# ------------------------------------------------------------------------------
+**/surefire-reports/
+**/failsafe-reports/
+**/jacoco/
+**/coverage/
+.jacoco
+.connect
+
+# ------------------------------------------------------------------------------
+# 10. AI Development Tools Caches (Cursor, Codex, Antigravity)
+# ------------------------------------------------------------------------------
+.cursor/**
+!.cursor/rules/
+.codex/**
+.antigravity/**
+!.antigravity/architecture.md
+!.antigravity/coding-standards.md
+!.antigravity/security.md
+!.antigravity/git-workflow.md
+!.antigravity/testing.md
+!.antigravity/database-guidelines.md
+!.antigravity/api-standards.md
+!.antigravity/project-instructions.md

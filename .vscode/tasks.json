@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Maven: Clean (Auth Service)",
+      "type": "shell",
+      "command": "./mvnw clean",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-service"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Maven: Test (Auth Service)",
+      "type": "shell",
+      "command": "./mvnw test",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-service"
+      },
+      "group": "test"
+    },
+    {
+      "label": "Maven: Package (Auth Service)",
+      "type": "shell",
+      "command": "./mvnw package -DskipTests",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-service"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Spring Boot: Run (Auth Service)",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-service"
+      },
+      "group": "none"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/target": true,
+    "**/.mvn": true,
+    "**/.idea": true
+  },
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+  "java.format.settings.profile": "GoogleStyle",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.import.maven.enabled": true,
+  "java.imports.gradle.wrapper.checksums": [
+    {
+      "sha256": "true",
+      "allowed": true
+    }
+  ],
+  "java.completion.favoriteStaticMembers": [
+    "org.junit.jupiter.api.Assertions.*",
+    "org.mockito.Mockito.*",
+    "org.assertj.core.api.Assertions.*",
+    "org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*",
+    "org.springframework.test.web.servlet.result.MockMvcResultMatchers.*"
+  ],
+  "java.sources.organizeImports.starThreshold": 99,
+  "java.sources.organizeImports.staticStarThreshold": 99,
+  "sonarLint.rules": {
+    "java:S112": {
+      "level": "on"
+    }
+  }
+}

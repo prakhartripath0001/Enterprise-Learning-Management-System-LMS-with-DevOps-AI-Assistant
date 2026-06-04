@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Auth Service (Local)",
+      "request": "launch",
+      "mainClass": "com.auth_service.AuthServiceApplication",
+      "projectName": "auth-service",
+      "env": {
+        "SERVER_PORT": "8081",
+        "DB_HOST": "localhost",
+        "DB_PORT": "3306",
+        "DB_NAME": "lms_db",
+        "DB_USER": "lms_user",
+        "DB_PASSWORD": "lms_password"
+      }
+    }
+  ]
+}
