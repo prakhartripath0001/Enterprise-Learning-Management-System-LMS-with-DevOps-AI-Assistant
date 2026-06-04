@@ -63,7 +63,18 @@ class AdminControllerTest {
     @Test
     @DisplayName("GET /api/v1/admin/users/{id} — Success")
     void getUserById_ShouldReturn200_WhenUserExists() throws Exception {
-        UserProfileResponse response = new UserProfileResponse("user-123", "john.doe@example.com", "johndoe", "John", "Doe", Set.of("ROLE_STUDENT"), true);
+        UserProfileResponse response = new UserProfileResponse(
+                "user-123",
+                "john.doe@example.com",
+                "johndoe",
+                "John",
+                "Doe",
+                Set.of("ROLE_STUDENT"),
+                Collections.emptySet(),
+                true,
+                java.time.LocalDateTime.now(),
+                java.time.LocalDateTime.now()
+        );
 
         when(userService.getCurrentUser("user-123")).thenReturn(response);
 

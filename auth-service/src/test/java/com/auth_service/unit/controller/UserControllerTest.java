@@ -61,7 +61,18 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/v1/users/me — Success")
     void getCurrentUser_ShouldReturn200_WhenAuthenticated() throws Exception {
-        UserProfileResponse response = new UserProfileResponse("user-id-123", "john.doe@example.com", "johndoe", "John", "Doe", Set.of("ROLE_STUDENT"), true);
+        UserProfileResponse response = new UserProfileResponse(
+                "user-id-123",
+                "john.doe@example.com",
+                "johndoe",
+                "John",
+                "Doe",
+                Set.of("ROLE_STUDENT"),
+                Collections.emptySet(),
+                true,
+                java.time.LocalDateTime.now(),
+                java.time.LocalDateTime.now()
+        );
 
         when(userService.getCurrentUser(anyString())).thenReturn(response);
 
@@ -77,7 +88,18 @@ class UserControllerTest {
     @DisplayName("PUT /api/v1/users/me — Success")
     void updateProfile_ShouldReturn200_WhenPayloadIsValid() throws Exception {
         UpdateProfileRequest request = new UpdateProfileRequest("Jonathan", "Doe", "johndoe");
-        UserProfileResponse response = new UserProfileResponse("user-id-123", "john.doe@example.com", "johndoe", "Jonathan", "Doe", Set.of("ROLE_STUDENT"), true);
+        UserProfileResponse response = new UserProfileResponse(
+                "user-id-123",
+                "john.doe@example.com",
+                "johndoe",
+                "Jonathan",
+                "Doe",
+                Set.of("ROLE_STUDENT"),
+                Collections.emptySet(),
+                true,
+                java.time.LocalDateTime.now(),
+                java.time.LocalDateTime.now()
+        );
 
         when(userService.updateProfile(anyString(), any(UpdateProfileRequest.class))).thenReturn(response);
 

@@ -5,9 +5,9 @@ import com.auth_service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -19,14 +19,17 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.flyway.enabled=false",
         "spring.jpa.hibernate.ddl-auto=create-drop"
 })
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @DisplayName("UserRepository JPA Slice Tests")
 class UserRepositoryTest {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final TestEntityManager entityManager;
 
-    @Autowired
-    private TestEntityManager entityManager;
+    UserRepositoryTest(UserRepository userRepository, TestEntityManager entityManager) {
+        this.userRepository = userRepository;
+        this.entityManager = entityManager;
+    }
 
     private User activeUser;
     private User deletedUser;

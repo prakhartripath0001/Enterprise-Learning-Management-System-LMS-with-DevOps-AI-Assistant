@@ -20,7 +20,8 @@ This guide details running the AetherLMS stack locally and containerized using D
     export DB_PORT=3306
     export DB_NAME=lms_db
     export DB_USER=lms_user
-    export DB_PASSWORD=lms_password
+    export DB_PASSWORD=<use-a-local-strong-password>
+    export JWT_SECRET=<use-a-256-bit-or-stronger-secret>
     ```
 *   Run the service inside the `auth-service` folder:
     ```bash

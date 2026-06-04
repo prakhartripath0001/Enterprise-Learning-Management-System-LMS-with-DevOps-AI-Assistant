@@ -14,6 +14,10 @@ COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 MAX_WAIT=120   # seconds to wait for services to be healthy
 AUTH_PORT=8081
 
+: "${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required for Docker validation}"
+: "${DB_PASSWORD:?DB_PASSWORD is required for Docker validation}"
+: "${JWT_SECRET:?JWT_SECRET is required for Docker validation}"
+
 cleanup() {
   echo -e "\n${YELLOW}▶ Tearing down Docker stack...${NC}"
   docker compose -f "$COMPOSE_FILE" down -v --remove-orphans 2>/dev/null || true
@@ -33,7 +37,7 @@ echo -e "${GREEN}✔ Docker Compose stack started${NC}"
 # ── 3. Wait for MySQL Readiness ───────────────────────────────────────────────
 echo -e "${YELLOW}▶ Waiting for MySQL to be healthy...${NC}"
 ELAPSED=0
-until docker compose -f "$COMPOSE_FILE" exec -T db mysqladmin ping -u root -prootpassword --silent 2>/dev/null; do
+until docker compose -f "$COMPOSE_FILE" exec -T db mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD" --silent 2>/dev/null; do
   sleep 3; ELAPSED=$((ELAPSED+3))
   echo "  Waiting... ($ELAPSED/${MAX_WAIT}s)"
   [ "$ELAPSED" -ge "$MAX_WAIT" ] && { echo -e "${RED}✘ MySQL did not become healthy in time${NC}"; exit 1; }

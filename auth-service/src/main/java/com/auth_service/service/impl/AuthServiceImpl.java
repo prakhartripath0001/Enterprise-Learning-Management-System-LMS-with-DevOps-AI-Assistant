@@ -52,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
     private static final String ROLE_STUDENT = "ROLE_STUDENT";
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final int LOCK_DURATION_MINUTES = 30;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -106,7 +107,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Default role not configured"));
 
         User user = new User();
-        user.setEmail(request.email().toLowerCase());
+        user.setEmail(request.email().toLowerCase(java.util.Locale.ROOT));
         user.setUsername(request.username());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setFirstName(request.firstName());
@@ -122,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request, String ipAddress, String userAgent) {
-        User user = userRepository.findByEmail(request.email().toLowerCase())
+        User user = userRepository.findByEmail(request.email().toLowerCase(java.util.Locale.ROOT))
                 .orElse(null);
 
         if (user == null) {
@@ -168,18 +169,7 @@ public class AuthServiceImpl implements AuthService {
         saveAuditLog(user.getId(), user.getEmail(), "LOGIN_SUCCESS", true, ipAddress, userAgent, null);
 
         String accessToken = jwtService.generateAccessToken(user);
-        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
-
-        return new AuthResponse(
-                accessToken,
-                rawRefreshToken,
-                "Bearer",
-                900L,
-                new AuthResponse.UserSummary(
-                        user.getId(), user.getEmail(), user.getUsername(),
-                        user.getFirstName(), user.getLastName(), roles,
-                        user.getEmailVerifiedAt() != null)
-        );
+        return buildAuthResponse(user, accessToken, rawRefreshToken);
     }
 
     @Override
@@ -218,13 +208,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenRepository.save(newToken);
 
         String accessToken = jwtService.generateAccessToken(user);
-        Set<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
-
-        return new AuthResponse(accessToken, newRawToken, "Bearer", 900L,
-                new AuthResponse.UserSummary(
-                        user.getId(), user.getEmail(), user.getUsername(),
-                        user.getFirstName(), user.getLastName(), roles,
-                        user.getEmailVerifiedAt() != null));
+        return buildAuthResponse(user, accessToken, newRawToken);
     }
 
     @Override
@@ -250,7 +234,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findByEmail(request.email().toLowerCase()).ifPresent(user -> {
+        userRepository.findByEmail(request.email().toLowerCase(java.util.Locale.ROOT)).ifPresent(user -> {
             String rawToken = generateSecureToken();
             PasswordResetToken prt = new PasswordResetToken();
             prt.setUser(user);
@@ -344,7 +328,7 @@ public class AuthServiceImpl implements AuthService {
 
     private String generateSecureToken() {
         byte[] bytes = new byte[48];
-        new SecureRandom().nextBytes(bytes);
+        SECURE_RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
@@ -354,7 +338,28 @@ public class AuthServiceImpl implements AuthService {
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not available", e);
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
         }
+    }
+
+    private AuthResponse buildAuthResponse(User user, String accessToken, String refreshToken) {
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                "Bearer",
+                900L,
+                new AuthResponse.UserSummary(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getUsername(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        roles,
+                        user.getEmailVerifiedAt() != null
+                )
+        );
     }
 }

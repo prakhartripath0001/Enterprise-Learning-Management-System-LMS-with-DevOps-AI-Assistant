@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
             throw new IllegalArgumentException("Role '" + request.name() + "' already exists");
         }
         Role role = new Role();
-        role.setName(request.name().toUpperCase());
+        role.setName(request.name().toUpperCase(java.util.Locale.ROOT));
         role.setDescription(request.description());
         role.setCreatedBy("SYSTEM");
         return toResponse(roleRepository.save(role));

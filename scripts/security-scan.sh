@@ -20,7 +20,7 @@ SECRET_PATTERN='(password|secret|private_key|api_key|jwt_secret|credentials|toke
 MATCHES=$(grep -rEnI "$SECRET_PATTERN" \
   --include="*.java" --include="*.properties" --include="*.yml" --include="*.json" \
   "$ROOT_DIR" \
-  --exclude-dir=target --exclude-dir=.git --exclude-dir=node_modules \
+  --exclude-dir=target --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.github \
   2>/dev/null || true)
 
 if [ -n "$MATCHES" ]; then
@@ -36,7 +36,7 @@ echo "  Scanning for TODO/FIXME comments..."
 TODOS=$(grep -rn "TODO\|FIXME" \
   --include="*.java" --include="*.properties" --include="*.yml" \
   "$ROOT_DIR" \
-  --exclude-dir=target --exclude-dir=.git \
+  --exclude-dir=target --exclude-dir=.git --exclude-dir=.github \
   2>/dev/null || true)
 
 if [ -n "$TODOS" ]; then
@@ -51,7 +51,7 @@ fi
 echo "  Scanning for CORS wildcard (*) configurations..."
 CORS_WILDCARDS=$(grep -rn "allowedOrigins.*\\\*\|setAllowedOrigins.*\\\*" \
   --include="*.java" --include="*.yml" --include="*.properties" \
-  "$ROOT_DIR" --exclude-dir=target --exclude-dir=.git 2>/dev/null || true)
+  "$ROOT_DIR" --exclude-dir=target --exclude-dir=.git --exclude-dir=.github 2>/dev/null || true)
 
 if [ -n "$CORS_WILDCARDS" ]; then
   echo -e "${RED}  ✘ Wildcard CORS (*) detected — must not be used in production:${NC}"
@@ -65,7 +65,7 @@ fi
 echo "  Scanning for @Autowired field injection (violates AGENTS.md)..."
 AUTOWIRED=$(grep -rn "@Autowired" \
   --include="*.java" \
-  "$ROOT_DIR" --exclude-dir=target --exclude-dir=.git \
+  "$ROOT_DIR" --exclude-dir=target --exclude-dir=.git --exclude-dir=.github \
   2>/dev/null || true)
 
 if [ -n "$AUTOWIRED" ]; then
@@ -79,7 +79,7 @@ fi
 # ── 5. Raw Entity in Controller Return ────────────────────────────────────────
 echo "  Scanning for possible entity returns from controllers..."
 ENTITY_RETURNS=$(grep -rn "return.*Entity\|ResponseEntity.*Entity" \
-  "$ROOT_DIR" --include="*.java" --exclude-dir=target --exclude-dir=.git \
+  "$ROOT_DIR" --include="*.java" --exclude-dir=target --exclude-dir=.git --exclude-dir=.github \
   2>/dev/null | grep -i "controller" || true)
 
 if [ -n "$ENTITY_RETURNS" ]; then
