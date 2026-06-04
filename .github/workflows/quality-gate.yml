@@ -1,0 +1,155 @@
+name: Quality Gate
+
+on:
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ── Job 1: Secret & Security Scan ──────────────────────────────────────────
+  security-scan:
+    name: Security Scan (Secrets + Code Patterns)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks — Secret Detection
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for Hardcoded Secrets (Regex)
+        run: |
+          echo "Scanning for credential patterns..."
+          SECRET_PATTERN='(password|secret|private_key|api_key|jwt_secret|credentials|token)\s*=\s*["'"'"'][a-zA-Z0-9_\-\.:/+=]{8,}["'"'"']'
+          MATCHES=$(grep -rEnI "$SECRET_PATTERN" \
+            --include="*.java" --include="*.properties" --include="*.yml" \
+            . --exclude-dir=target --exclude-dir=.git 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            echo "::error::Potential hardcoded secrets found:"
+            echo "$MATCHES"
+            exit 1
+          fi
+          echo "No hardcoded secrets detected."
+
+      - name: Check for TODO / FIXME
+        run: |
+          FOUND=$(grep -rn "TODO\|FIXME" \
+            --include="*.java" --include="*.properties" --include="*.yml" \
+            . --exclude-dir=target --exclude-dir=.git 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::TODO/FIXME comments found in source files:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "No TODO/FIXME comments found."
+
+      - name: Check for @Autowired Field Injection
+        run: |
+          AUTOWIRED=$(grep -rn "@Autowired" \
+            --include="*.java" . --exclude-dir=target --exclude-dir=.git 2>/dev/null || true)
+          if [ -n "$AUTOWIRED" ]; then
+            echo "::error::@Autowired field injection violates AGENTS.md standards:"
+            echo "$AUTOWIRED"
+            exit 1
+          fi
+          echo "No @Autowired field injection found."
+
+      - name: Check for Wildcard CORS
+        run: |
+          CORS=$(grep -rn "allowedOrigins.*\*\|setAllowedOrigins.*\*" \
+            --include="*.java" --include="*.yml" \
+            . --exclude-dir=target --exclude-dir=.git 2>/dev/null || true)
+          if [ -n "$CORS" ]; then
+            echo "::error::Wildcard CORS (*) detected — forbidden in production:"
+            echo "$CORS"
+            exit 1
+          fi
+          echo "No wildcard CORS found."
+
+  # ── Job 2: Code Coverage Gate ───────────────────────────────────────────────
+  coverage-gate:
+    name: Code Coverage (JaCoCo ≥85%)
+    runs-on: ubuntu-latest
+    needs: security-scan
+
+    strategy:
+      matrix:
+        service: [ auth-service ]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Tests and Verify Coverage
+        working-directory: ${{ matrix.service }}
+        run: ./mvnw clean verify
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.service }}
+          path: ${{ matrix.service }}/target/site/jacoco/
+          retention-days: 14
+
+  # ── Job 3: Docker Build Validation ─────────────────────────────────────────
+  docker-build-validate:
+    name: Docker Build Validation
+    runs-on: ubuntu-latest
+    needs: coverage-gate
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build auth-service Docker Image
+        run: |
+          docker build \
+            --file auth-service/Dockerfile \
+            --tag lms-auth-service:ci-${{ github.sha }} \
+            auth-service/
+
+      - name: Validate Image was built
+        run: |
+          docker image inspect lms-auth-service:ci-${{ github.sha }}
+          echo "Docker image built and validated."
+
+  # ── Job 4: PR Quality Summary ──────────────────────────────────────────────
+  quality-summary:
+    name: Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [ security-scan, coverage-gate, docker-build-validate ]
+    if: always()
+
+    steps:
+      - name: Quality Gate Result
+        run: |
+          if [[ "${{ needs.security-scan.result }}" == "success" && \
+                "${{ needs.coverage-gate.result }}" == "success" && \
+                "${{ needs.docker-build-validate.result }}" == "success" ]]; then
+            echo "✅ All quality gates PASSED — PR is safe to merge."
+          else
+            echo "❌ Quality gate FAILED:"
+            echo "  Security Scan  : ${{ needs.security-scan.result }}"
+            echo "  Coverage Gate  : ${{ needs.coverage-gate.result }}"
+            echo "  Docker Build   : ${{ needs.docker-build-validate.result }}"
+            exit 1
+          fi
