@@ -1,0 +1,21 @@
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+
+# Copy Maven wrapper configuration and project descriptor
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+
+# Pre-fetch dependencies for faster build iterations
+RUN ./mvnw dependency:go-offline -B
+
+# Copy the file-watching compile script
+COPY watch-and-compile.sh ./
+RUN chmod +x watch-and-compile.sh
+
+# Copy source files
+COPY src ./src
+
+EXPOSE 8081
+
+# Start the compiler watch script in the background, and spring-boot in the foreground
+CMD ["sh", "-c", "./watch-and-compile.sh & ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev"]

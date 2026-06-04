@@ -1,0 +1,16 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Copy package lists
+COPY package.json package-lock.json ./
+
+# Install npm dependencies inside container
+RUN npm install
+
+# Copy rest of the application files
+COPY . .
+
+EXPOSE 5173
+
+# Run Vite dev server
+CMD ["npm", "run", "dev"]

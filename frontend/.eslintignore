@@ -1,0 +1,5 @@
+node_modules/
+dist/
+coverage/
+eslint.config.js
+vite.config.js
