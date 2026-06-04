@@ -51,7 +51,8 @@ Before contributing, ensure you have the following installed:
 | Node.js     | 18+         |
 | Docker      | 24+         |
 | Git         | 2.40+       |
-| PostgreSQL  | 15+         |
+| MySQL       | 8.0+        |
+
 
 ### Fork and Clone
 
